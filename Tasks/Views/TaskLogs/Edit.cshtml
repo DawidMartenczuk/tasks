@@ -1,0 +1,33 @@
+﻿@model Tasks.Models.TaskLog
+
+@{
+    Layout = null;
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form asp-action="Edit" asp-controller="TaskLogs" asp-route-id="@Model.Id">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="TaskId" />
+    <input type="hidden" asp-for="UserId" />
+    <div class="card-header">
+        <div class="clearfix">
+            <div class="float-left"><input asp-for="Title" class="form-control" /></div>
+            <div class="float-right">@Html.DisplayFor(model => Model.User.UserName), @Html.DisplayFor(model => Model.Created)</div>
+        </div>
+    </div>
+    <div class="card-body">
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+        @if (Model.Updated.HasValue)
+        {
+        <p class="text-muted">@Html.DisplayNameFor(model => Model.Updated): @Html.DisplayFor(model => Model.Updated)</p>
+        }
+    </div>
+    <div class="card-footer text-right">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

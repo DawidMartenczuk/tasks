@@ -1,0 +1,80 @@
+﻿@model Tasks.Models.Task
+@using Tasks.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>@Html.DisplayFor(model => model.Title)</h1>
+<hr />
+<div class="card mb-5">
+    <div class="card-header">
+        <div class="clearfix">
+            <div class="float-left">
+                <b>
+                    @if (Model.Closed)
+                    {
+                        <span class="badge badge-danger">Closed</span>
+                    }
+                    @Html.DisplayFor(model => model.Title)
+                </b>
+            </div>
+            <div class="float-right">@Html.DisplayFor(model => model.Created)</div>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>@Html.DisplayFor(model => model.Description)</p>
+        @if (!string.IsNullOrEmpty(Model.AssigneeId))
+        {
+            <p class="text-muted">@Html.DisplayNameFor(model => model.Assignee): @Html.DisplayFor(model => model.Assignee.UserName)</p>
+        }
+        @if (Model.MilestoneId.HasValue)
+        {
+            <p class="text-muted">@Html.DisplayNameFor(model => model.Milestone): @Html.DisplayFor(model => model.Milestone.Title)</p>
+        }
+        @if (Model.Updated.HasValue)
+        {
+            <p class="text-muted">@Html.DisplayNameFor(model => model.Updated): @Html.DisplayFor(model => model.Updated)</p>
+        }
+        @if (Model.Closed)
+        {
+            <p class="text-muted">@Html.DisplayNameFor(model => model.Closed): @Html.DisplayFor(model => model.Closed)</p>
+        }
+    </div>
+</div>
+<div id="logIndex"></div>
+<div id="logCreate"></div>
+<hr />
+<div class="clearfix">
+    <div class="float-left">
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+    <div class="float-right">
+        @if (SignInManager.IsSignedIn(User) && (string.Equals((string)UserManager.GetUserId(User), Model.AuthorId) || string.Equals((string)UserManager.GetUserId(User), Model.AssigneeId)))
+        {
+            <a asp-action="Toggle" asp-route-id="@Model.Id" class="btn @(Model.Closed ? "btn-outline-success" : "btn-outline-danger")">@(Model.Closed ? "Open" : "Close")</a>
+        }
+        @if (SignInManager.IsSignedIn(User) && string.Equals((string)UserManager.GetUserId(User), Model.AuthorId))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $.get('@Url.Action("Index", "TaskLogs")', { id: @Model.Id}, function (content) { $("#logIndex").html(content); });
+    </script>
+    @if (!Model.Closed || (SignInManager.IsSignedIn(User) && (string.Equals((string)UserManager.GetUserId(User), Model.AuthorId) || string.Equals((string)UserManager.GetUserId(User), Model.AssigneeId)))) {
+        <script type="text/javascript">
+        $.get('@Url.Action("Create", "TaskLogs")', { id: @Model.Id}, function (content) { $("#logCreate").html(content); });
+        $(document).on('click', '[data-log-id] [data-log-edit]', function (e) {
+            let body = $(this).closest('[data-log-id]');
+            $.get('@Url.Action("Edit", "TaskLogs")', { id: body.data('log-id')}, function (content) { body.html(content); });
+        });
+        </script>
+    }
+}

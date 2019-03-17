@@ -6,10 +6,26 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Migrations\20190317012346_Initial.cs" />
+    <Compile Remove="Migrations\20190317012346_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20190317013037_TaskLogUser.cs" />
+    <Compile Remove="Migrations\20190317013037_TaskLogUser.Designer.cs" />
+    <Compile Remove="Migrations\20190317020200_Initial.cs" />
+    <Compile Remove="Migrations\20190317020200_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20190317075455_TaskLogUpdated.cs" />
+    <Compile Remove="Migrations\20190317075455_TaskLogUpdated.Designer.cs" />
+    <Compile Remove="Migrations\20190317131813_TaskAuthor.cs" />
+    <Compile Remove="Migrations\20190317131813_TaskAuthor.Designer.cs" />
+    <Compile Remove="Migrations\20190317135036_TaskClosed.cs" />
+    <Compile Remove="Migrations\20190317135036_TaskClosed.Designer.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
   </ItemGroup>
 
 </Project>

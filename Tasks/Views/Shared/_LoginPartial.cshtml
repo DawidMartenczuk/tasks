@@ -1,26 +1,38 @@
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@using Tasks.Data
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
+    @if (SignInManager.IsSignedIn(User))
+    {
     <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+        <div class="btn-group btn-group-sm mt-2">
+            <a asp-controller="Tasks" asp-action="Create" title="New Task" class="btn btn-success">New Task</a>
+            <a asp-controller="Tasks" asp-action="Create" asp-route-assignee="@UserManager.GetUserId(User)" title="New Task assigned to me" class="btn btn-success">+</a>
+        </div>
     </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Tasks" asp-action="Index" asp-route-assignee="@UserManager.GetUserId(User)" title="Manage">
+                <span class="btn btn-outline-primary btn-sm">My tasks</span>
+            </a>
+        </li>
+        <li class="nav-item pt-1">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@User.Identity.Name</a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="btn btn-outline-danger btn-sm mt-2">Logout</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+    }
 </ul>

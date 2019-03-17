@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Tasks.Models.Milestone>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Milestones";
+}
+
+<div class="clearfix">
+    <div class="float-left"><h1>Milestones</h1></div>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <div class="float-right"><a asp-action="Create" class="btn btn-success">Create New</a></div>
+    }
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Start)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.End)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                    @if (item.End < DateTime.Now)
+                    {
+                        <span class="badge badge-danger">Outdated</span>
+                    }
+                    @if (item.Start > DateTime.Now)
+                    {
+                        <span class="badge badge-success">Upcoming</span>
+                    }
+                    <br />
+                    <small class="text-muted">@Html.DisplayFor(modelItem => item.Description)</small>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Start)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.End)
+                </td>
+                <td class="text-right">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-secondary">Details</a>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="text-right mt-3">
+        <a asp-action="Create" class="btn btn-success">Create New</a>
+    </div>
+}

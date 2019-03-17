@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Tasks.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Tasks.Models;
 
 namespace Tasks
 {
@@ -38,7 +39,7 @@ namespace Tasks
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
+            services.AddDefaultIdentity<ApplicationUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 

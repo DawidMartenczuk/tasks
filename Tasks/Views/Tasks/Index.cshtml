@@ -1,0 +1,114 @@
+﻿@model IEnumerable<Tasks.Models.Task>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Tasks";
+}
+
+<div class="clearfix">
+    <div class="float-left"><h1>Tasks</h1></div>
+    @if (SignInManager.IsSignedIn(User))
+    {
+    <div class="float-right">
+        <div class="btn-group">
+            <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Create New
+            </button>
+            <div class="dropdown-menu">
+                <a asp-action="Create" class="dropdown-item">Task</a>
+                <a asp-action="Create" asp-route-assignee="@UserManager.GetUserId(User)" class="dropdown-item">Task assigned to me</a>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+<form class="form-inline" method="get">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <input name="q" value="@ViewData["q"]" class="form-control" placeholder="@Html.DisplayNameFor(model => model.Title)">
+                    
+                </th>
+                <th>
+                    <select name="author" class="form-control" asp-items="ViewBag.Authors"><option value="" selected>@Html.DisplayNameFor(model => model.Author)</option></select>
+                </th>
+                <th>
+                    <select name="assignee" class="form-control" asp-items="ViewBag.Assignees"><option value="" selected>@Html.DisplayNameFor(model => model.Assignee)</option></select>
+                </th>
+                <th class="text-right">
+                    <div class="form-inline float-right">
+                        <div class="form-check mr-sm-5">
+                            <input class="form-check-input" type="checkbox" name="closed" id="closed" value="1" @(ViewData["closed"].Equals(true) ? "checked" : "")>
+                            <label class="form-check-label" for="closed">Show closed</label>
+                        </div>
+                        <button type="submit" class="btn btn-secondary d-inline-block">Search</button>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @if (item.MilestoneId.HasValue)
+                        {
+                            <a asp-controller="Milestones" asp-action="Details" asp-route-id="@item.Milestone.Id"><span class="badge badge-primary">@Html.DisplayFor(modelItem => item.Milestone.Title)</span></a>
+                        }
+                        @if (item.Closed)
+                        {
+                            <span class="badge badge-danger">Closed</span>
+                        }
+                        @Html.DisplayFor(modelItem => item.Title)<br />
+                        <small>
+                            @Html.DisplayFor(modelItem => item.Created)
+                            @if (item.Updated.HasValue)
+                            {
+                                <span class="text-muted">@Html.DisplayNameFor(model => model.Updated)<a>:</a> @Html.DisplayFor(modelItem => item.Updated)</span>
+                            }
+                        </small>
+                    </td>
+                    <td>
+                        <a asp-action="Index" asp-controller="Tasks" asp-route-author="@item.AuthorId">@Html.DisplayFor(modelItem => item.Author.UserName)</a>
+                    </td>
+                    <td>
+                        <a asp-action="Index" asp-controller="Tasks" asp-route-assignee="@item.AssigneeId">@Html.DisplayFor(modelItem => item.Assignee.UserName)</a>
+                    </td>
+                    <td class="text-right">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-secondary">Details</a>
+                        @if (SignInManager.IsSignedIn(User) && (string.Equals((string)UserManager.GetUserId(User), item.AuthorId) || string.Equals((string)UserManager.GetUserId(User), item.AssigneeId)))
+                        {
+                            <a asp-action="Toggle" asp-route-id="@item.Id" class="btn btn-sm @(item.Closed ? "btn-outline-success" : "btn-outline-danger")">@(item.Closed ? "Open" : "Close")</a>
+                        }
+                        @if (SignInManager.IsSignedIn(User) && string.Equals((string)UserManager.GetUserId(User), item.AuthorId))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
+
+<div class="clearfix">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <div class="float-right">
+            <div class="btn-group">
+                <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Create New
+                </button>
+                <div class="dropdown-menu">
+                    <a asp-action="Create" class="dropdown-item">Task</a>
+                    <a asp-action="Create" asp-route-assignee="@UserManager.GetUserId(User)" class="dropdown-item">Task assigned to me</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

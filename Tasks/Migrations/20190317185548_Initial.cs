@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Tasks.Data.Migrations
+namespace Tasks.Migrations
 {
-    public partial class CreateIdentitySchema : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -45,6 +45,22 @@ namespace Tasks.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Milestone",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(maxLength: 128, nullable: false),
+                    Description = table.Column<string>(maxLength: 1024, nullable: true),
+                    Start = table.Column<DateTime>(nullable: false),
+                    End = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Milestone", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -153,6 +169,74 @@ namespace Tasks.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Task",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(maxLength: 128, nullable: false),
+                    Description = table.Column<string>(maxLength: 16384, nullable: false),
+                    Created = table.Column<DateTime>(nullable: false),
+                    Updated = table.Column<DateTime>(nullable: true),
+                    AuthorId = table.Column<string>(nullable: true),
+                    AssigneeId = table.Column<string>(nullable: true),
+                    MilestoneId = table.Column<int>(nullable: true),
+                    Closed = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Task", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Task_AspNetUsers_AssigneeId",
+                        column: x => x.AssigneeId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Task_AspNetUsers_AuthorId",
+                        column: x => x.AuthorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Task_Milestone_MilestoneId",
+                        column: x => x.MilestoneId,
+                        principalTable: "Milestone",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TaskLog",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(maxLength: 128, nullable: false),
+                    Description = table.Column<string>(maxLength: 1024, nullable: false),
+                    Created = table.Column<DateTime>(nullable: false),
+                    Updated = table.Column<DateTime>(nullable: true),
+                    TaskId = table.Column<int>(nullable: false),
+                    UserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TaskLog", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TaskLog_Task_TaskId",
+                        column: x => x.TaskId,
+                        principalTable: "Task",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TaskLog_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -191,6 +275,31 @@ namespace Tasks.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Task_AssigneeId",
+                table: "Task",
+                column: "AssigneeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Task_AuthorId",
+                table: "Task",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Task_MilestoneId",
+                table: "Task",
+                column: "MilestoneId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaskLog_TaskId",
+                table: "TaskLog",
+                column: "TaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaskLog_UserId",
+                table: "TaskLog",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -211,10 +320,19 @@ namespace Tasks.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "TaskLog");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "Task");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Milestone");
         }
     }
 }
